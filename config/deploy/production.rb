@@ -10,7 +10,7 @@ role :app, %w{deployer@191.252.109.24}
 role :web, %w{deployer@191.252.109.24}
 role :db,  %w{deployer@191.252.109.24}
 
-set :application, 'balcony'
+set :application, 'atacado'
 set :repo_url, 'git@github.com:juli0w/atacado.git'
 set :branch, 'master'
 
