@@ -11,7 +11,7 @@ role :web, %w{deployer@191.252.109.24}
 role :db,  %w{deployer@191.252.109.24}
 
 set :application, 'balcony'
-set :repo_url, 'git@github.com:juli0w/balcony.git'
+set :repo_url, 'git@github.com:juli0w/atacado.git'
 set :branch, 'master'
 
 set :linked_files, %w{config/database.yml config/secrets.yml}
