@@ -1,0 +1,99 @@
+<script>
+$(document).ready(function() {
+  $("#email").blur(function() {
+    client = $.get('<%= get_clients_path %>', { email: $(this).val() });
+  });
+});
+</script>
+<div class="row five-margin-bot">
+  <div class="col s12 caixa">
+    <h5>CONFIRMAR DADOS</h5>
+  </div>
+</div>
+<style>
+.row .card .row {
+  margin-bottom: 0;
+}
+.row .card .row input[type="text"] {
+  padding: 0 !important;
+  height: 30px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.titled {
+  color: #767676; font-size: 9px;
+  text-transform: uppercase;
+  line-height: 2.5em;
+}
+.rowed {
+  padding: 0 10px;
+  padding-bottom: 5px;
+  margin: 0;
+  font-size: 14px;
+}
+</style>
+<div class="row">
+  <div class="col s12">
+    <div class="card">
+      <%= form_for @client, url: finish_order_path, method: :post do |f| %>
+        <div class="card-content">
+          <div class="row">
+            <div class="input-field col s12">
+              <%= select_tag(:seller, options_from_collection_for_select(User.where("role >= 2"), :username, :name, current_user.try(:username))) %>
+              <%= label_tag :seller, "Vendedor" %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="input-field col s12">
+              <%= label_tag :obs, 'Observações' %>
+              <%= text_area_tag :obs, "", class: "materialize-textarea", style: "height: 100px" %>
+            </div>
+          </div>
+
+          <h6 style="color: #767676; margin-bottom: 30px; margin-top: 20px; font-weight: bold;">Dados do cliente</h6>
+
+          <div class="row rowed">
+            <div style="float: left; min-width: 300px;">
+              <span class="titled">Razão social:<br></span>
+              <%= @client.try(:company) || "Não informado" %>
+            </div>
+            <div style="float: left;">
+              <span class="titled">Nome:<br></span>
+              <%= @client.try(:name) || "Não informado" %>
+            </div>
+            <div style="float:right; width: 180px;">
+              <span class="titled">Telefone:<br></span>
+              <%= @client.try(:phone) || "Não informado" %>
+            </div>
+            <div style="float:right; width: 140px;">
+              <span class="titled">CNPJ:<br></span>
+              <%= @client.try(:cpf) || "Não informado" %>
+            </div>
+          </div>
+
+          <div class="row rowed" style="margin-bottom: 20px;">
+            <div style="float: left;">
+              <span class="titled">Endereço:<br></span>
+              <%= @client.address || 'Não informado' %>
+              <%= ", #{@client.district}" unless @client.district.blank? %>
+            </div>
+            <div style="float:right; width: 180px;">
+              <span class="titled">Município:<br></span>
+              <%= @client.try(:city) || "Não informado" %> <%= @client.try(:uf) %>
+            </div>
+            <div style="float:right; width: 140px;">
+              <span class="titled">CEP:<br></span>
+              <%= @client.try(:cep) || "Não informado" %>
+            </div>
+          </div>
+
+        <div class="card-action">
+          <button id="submit" class="btn waves-effect waves-light light-green" type="submit" name="action">
+            <%= material_icon.shopping_cart.css_class("left") %> Finalizar
+          </button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

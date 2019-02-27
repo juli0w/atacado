@@ -1,0 +1,168 @@
+<div class="row" style="margin-bottom: -7px;">
+<div class="col s12 m6 red darken-1 white-text" style="height: 54px; padding: 0;">
+  <span style="padding: 5px;" class="left">
+    <%= @client.name %>
+    <br><%= @client.company %>
+  </span>
+</div>
+<div class="col s12 m6 red darken-1 white-text" style="padding: 0;">
+  <a class="btn-large right green" onclick="$('.search').slideToggle(); $('.cart').slideToggle(); $('#search').focus();">
+    <i class="large material-icons">shopping_cart</i>
+  </a>
+
+  <%= link_to "#client-infos", class: "modal-trigger btn-large right red darken-1" do %>
+    <i class="large material-icons">account_box</i>
+  <% end %>
+
+  <%= link_to clear_client_path(@client), class: "btn-large right red darken-1" do %>
+    <i class="large material-icons">refresh</i>
+  <% end %>
+</div>
+<div class="col s12 no-space cart" style="display: none;">
+  <%= render "cart/cart" %>
+</div>
+</div>
+<div class="search">
+<div class="row" style="margin-top: 0px; margin-bottom: 0;">
+  <div class="card-panel">
+    <div class="search-offers">
+      <%= form_tag tintas_path, method: :get do %>
+        <fieldset style="border: none; margin: 0; padding: 0;">
+          <div class="row" style="margin-bottom: 0;">
+            <div class="input-field col s12 m3">
+              <%= select_tag :marca, options_for_select([ "Resicolor" ], "Resicolor") %>
+            </div>
+            <div class="input-field col s12 m5">
+              <%= text_field_tag :color, params[:color], id: "search", class: "autocomplete" %>
+              <%= label_tag :color, "Cor" %>
+            </div>
+            <div class="input-field col s12 m4">
+              <%= select_tag :can, options_for_select({"Lata" => "LATA", "Galão" => "GALAO", "Quarto" => "QUARTO"}, params[:can]) %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12 m3">
+              <%= select_tag(:line, options_from_collection_for_select(Rline.all, :id, :name, params[:line]), include_blank: true, prompt: "Linha") %>
+            </div>
+
+            <div class="input-field col s12 m3">
+              <%= select_tag(:rp, options_for_select(Rproduct.all.map(&:code).uniq, params[:rp]), include_blank: true, prompt: "Cobertura") %>
+            </div>
+          </div>
+
+          <button class="btn" type="submit" name="action">
+            Buscar
+          </button>
+        </fieldset>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% if @tintas %>
+<% @tintas.first(50).each do |tinta| %>
+<div id="rf-<%= tinta.id %>" class="modal">
+  <div class="modal-content">
+    <h5 style="text-align: center;"><%= tinta.color.split("-").first.humanize %> (<%= params[:can] %>)</h5>
+    <h6 style="text-align: center; margin-bottom: 20px;"><%= "#{tinta.rline.name} - #{tinta.rproduct.code}" %></h5>
+    <table class="striped bordered">
+      <tbody>
+        <% (1..6).each do |n| %>
+          <% base = tinta.get_base(n) %>
+          <% if base %>
+            <tr>
+              <td><%= base.try(:name) %></td>
+              <td><%= number_to_currency tinta.rbase(base.try(:code)).try(:price) %></td>
+              <td><%= tinta.send("q#{n}") * Rformula::CAN[params[:can]] %></td>
+              <td><%= number_to_currency ((tinta.rbase(base.try(:code)).try(:price) /946) *tinta.send("q#{n}")* Rformula::CAN[params[:can]]) %></td>
+            </tr>
+          <% end %>
+        <% end %>
+        <tr>
+          <td colspan="3"><%= tinta.g_base(params[:can]).item.try(:name) %></td>
+          <td><%= number_to_currency tinta.price_base(params[:can]) %></td>
+        </tr>
+        <tr>
+          <td colspan="3"></td>
+          <td><%= number_to_currency tinta.calculate_price(params[:can]) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <!-- <div style="background-color: #<%= tinta.rgb %>;
+                width: 80px; height: 40px;
+                border: 1px solid #dedede;
+                bottom: 20px; left: 20px; position: absolute;"><%#= tinta.rgb %></div> !-->
+
+    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Fechar</a>
+  </div>
+</div>
+<% end %>
+<% end %>
+
+<div class="card-panel" style="margin-top: -14px;">
+  <table class="bordered">
+    <thead>
+      <tr style="background-color: #efefef; border: 1px solid #dedede;">
+          <th data-field="name">Cor</th>
+          <th data-field="name">Linha</th>
+          <th data-field="name">Cobertura</th>
+          <th data-field="name">Preço</th>
+          <th data-field="actions"></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% if @tintas %>
+        <% @tintas.first(30).each do |tinta| %>
+        <tr>
+          <td><%= tinta.rcolor.name.split("-").first %></td>
+          <td><%= tinta.rline.name.split("-")[1] %></td>
+          <td><%= tinta.rproduct.code.gsub("[NOVO]","") %></td>
+          <td><%= number_to_currency tinta.calculate_price(params[:can]) %></td>
+          <td>
+            <%= link_to "Fórmula", "#rf-#{tinta.id}", class: "modal-trigger" %> |
+            <%= link_to "Adicionar", order_tintas_path(tinta_id: tinta.id, quantity: 1, can: params[:can]), method: :post, remote: true %>
+          </td>
+        </tr>
+
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+</div>
+<div id="client-infos" class="modal">
+  <div class="modal-content">
+    <h5 style="text-align: center;"><%= @client.name %></h5>
+    <table>
+      <tbody>
+        <tr>
+          <td style="text-align: right; padding-right: 20px; width: 170px;">Razão social</td>
+          <td><%= @client.company %> (<%= @client.section.try(:name) %>)</td>
+        </tr>
+        <tr>
+          <td style="text-align: right; padding-right: 20px; width: 170px;">Email</td>
+          <td><%= @client.email %></td>
+        </tr>
+        <tr>
+          <td style="text-align: right; padding-right: 20px; width: 170px;">Telefone</td>
+          <td><%= @client.phone %></td>
+        </tr>
+        <tr>
+          <td style="text-align: right; padding-right: 20px; width: 170px;">Endereço</td>
+          <td><%= @client.address %> <%= @client.district %> - <%= @client.city %>/<%= @client.uf %></td>
+        </tr>
+        <tr>
+          <td style="text-align: right; padding-right: 20px; width: 170px;">CPF/CNPJ</td>
+          <td><%= @client.cpf %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Fechar</a>
+    <%= link_to "Editar", [:edit, @client], class: "btn-flat" %>
+  </div>
+</div>

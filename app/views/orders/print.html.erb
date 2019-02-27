@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pedido #<%= @order.id %></title>
+    <%= csrf_meta_tags %>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <%= stylesheet_link_tag    'application', media: 'all' %>
+    <style>
+      .ident {
+        /*border: 1px solid #dedede;*/
+        /*padding: 5px;*/
+        width: 100%;
+      }
+
+      .ident td {
+        padding: 5px;
+      }
+
+      .bg {
+        text-align: right;
+      }
+      html {
+        background-color: white;
+      }
+      body {
+        max-width: 1200px;
+      }
+      .row { font-size: 10px; }
+      td { padding: 5px !important; }
+      .titled {
+        color: #767676; font-size: 8px;
+        text-transform: uppercase;
+      }
+      .titled th {
+        padding-top: 20px;
+        padding-bottom: 5px;
+      }
+      .rowed {
+        padding: 0 10px;
+        padding-bottom: 6px;
+        margin: 0;
+        border-bottom: 1px dashed #efefef;
+      }
+      table.striped > tbody > tr:nth-child(odd) {
+        background-color: #fafafa;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="row rowed" style="margin-bottom: 3px; padding-bottom: 0; padding-top: 7px; border-bottom: 0;">
+      <h5 style="font-size: 14px; font-weight: bold; float: left; display: none;">LOJA DO PINTOR</h5>
+      <img src="https://lojadopintor.net/wp-content/uploads/2018/04/logo-loja-do-pintor-2.png" width="80" />
+      <div style="float:right; width: 140px;">
+        <span class="titled">Data:<br></span>
+        <%= l(@order.created_at.to_date).split("-")[0] %>
+      </div>
+    </div>
+    <div class="row rowed">
+      <div style="float: left;">
+        <span class="titled">Pedido:<br></span>
+        <%= @order.id %>
+      </div>
+      <div style="float:right; width: 140px;">
+        <span class="titled">Vendedor:<br></span>
+        <%= @order.seller || @order.user.try(:email) %>
+      </div>
+    </div>
+    <div class="row rowed">
+      <div style="float: left;">
+        <span class="titled">Cliente:<br></span>
+        <%= @order.client.try(:company) || "Não informado" %>
+      </div>
+      <div style="float:right; width: 140px;">
+        <span class="titled">Telefone:<br></span>
+        <%= @order.client.try(:phone) || "Não informado" %>
+      </div>
+      <div style="float:right; width: 140px;">
+        <span class="titled">CNPJ:<br></span>
+        <%= @order.client.try(:cpf) || "Não informado" %>
+      </div>
+    </div>
+    <div class="row rowed">
+      <div style="float: left;">
+        <span class="titled">Endereço:<br></span>
+        <%= @order.client.address || 'Não informado' %>
+        <%= ", #{@order.client.district}" unless @order.client.district.blank? %>
+      </div>
+      <div style="float:right; width: 140px;">
+        <span class="titled">Município:<br></span>
+        <%= @order.client.try(:city) || "Não informado" %> <%= @order.client.try(:uf) %>
+      </div>
+      <div style="float:right; width: 140px;">
+        <span class="titled">CEP:<br></span>
+        <%= @order.client.try(:cep) || "Não informado" %>
+      </div>
+    </div>
+
+    <div class="row">
+      <table class="striped">
+        <thead>
+          <tr class="titled">
+              <th data-field="id" width=""></th>
+              <th data-field="item" width="">Produto</th>
+              <th data-field="unit" width="">Preço unitário</th>
+              <th data-field="quantity" width="">Quantidade</th>
+              <th data-field="total" width="">Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @order.order_items.each do |oi| %>
+            <tr>
+              <td><%= oi.item.code %></td>
+              <td><%= oi.item.name %></td>
+              <td><%= number_to_currency oi.unit_price %></td>
+              <td><%= oi.quantity %></td>
+              <td><%= number_to_currency oi.total_price %></td>
+            </tr>
+          <% end %>
+
+          <% @order.order_tintas.each do |oi| %>
+            <tr>
+              <td></td>
+              <td>
+                <%= oi.rformula.color.split("-").first %> (<%= oi.can.try(:humanize) %>)
+                <span style="font-size: .8em; display: block;"><%= oi.rformula.rline.name.split("-")[1] %></span>
+                <span style="font-size: .8em; display: block;"><%= oi.rformula.rproduct.code %></span>
+              </td>
+              <td><%= number_to_currency oi.unit_price %></td>
+              <td><%= oi.quantity %></td>
+              <td><%= number_to_currency oi.total_price %></td>
+            </tr>
+          <% end %>
+          <tr>
+            <td colspan='4' class="right-align">Total:</td>
+            <td><%= number_to_currency @order.total %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+<script>
+window.print();
+</script>
+  </body>
+</html>

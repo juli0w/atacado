@@ -1,0 +1,210 @@
+<div class="row" style="margin-top: -8px">
+  <div class="card-panel">
+    <div class="search-offers">
+      <%= form_tag dashboard_report_path, method: :get do %>
+        <fieldset style="border: none; margin: 0; padding: 0;">
+          <div class="row">
+            <div class="input-field col s12">
+              <%= label_tag :from, 'Data', class: "active" %>
+              <%= date_field_tag :date, (params[:date] || Date.today) %>
+            </div>
+          </div>
+            <button class="btn" type="submit" name="action">
+              Filtrar
+            </button>
+        </fieldset>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col s12">
+    <div class="card panel">
+      <%= line_chart @data, {maintainAspectRatio: false} %>
+    </div>
+  </div>
+
+  <div class="col s12 m6">
+    <div class="card-panel">
+      <h5 onclick="$('.report1').slideToggle(30);" style="border-bottom: 1px dashed #dedede; padding-bottom: 12px; margin-top: 0; font-size: 16px; color: #aeaeae; font-weight: bold;">
+        Vendas de <%= params[:date].blank? ? 'hoje' : params[:date] %> (por loja)
+      </h5>
+      <p style="font-size: 11px; color: #aeaeae;" class="report1">
+        Mês anterior: <%= number_to_currency @orders_last_month %><br>
+        <% @percent = (((@orders_total-@orders_last_month) / (@orders_total == 0 ? 1 : @orders_total ))*100).round(2) %>
+        Atual: <%= number_to_currency @orders_total %> (<%= @percent > 0 ? '+' : '' %><%= @percent %>%)
+      </p>
+      <table class="striped bordered report1">
+        <thead>
+          <tr>
+              <th data-field="id"></th>
+              <th data-field="name">Vendas</th>
+              <th data-field="actions">Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @orders.each do |user, orders| %>
+
+          <tr>
+            <td width="70%"><%= (user.try(:name) || user.try(:username)) || "Não associado" %></td>
+            <td width="15%"><%= orders.count %></td>
+            <td width="15%"><%= number_to_currency orders.sum(&:total) %></td>
+          </tr>
+
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col s12 m6">
+    <div class="card-panel" style="margin-top: 20px;">
+      <h5 onclick="$('.report2').slideToggle(30);" style="border-bottom: 1px dashed #dedede; padding-bottom: 12px; margin-top: 0; font-size: 16px; color: #aeaeae; font-weight: bold;">
+        Vendas do mês (por loja)
+      </h5>
+
+      <p class="report2" style="font-size: 11px; color: #aeaeae;">
+        Mês anterior: <%= number_to_currency @orders_by_last_month %><br>
+        <% @percent = (((@orders_by_month_total-@orders_by_last_month) / (@orders_by_month_total == 0 ? 1 : @orders_by_month_total ))*100).round(2) %>
+        Atual: <%= number_to_currency @orders_by_month_total %> (<%= @percent > 0 ? '+' : '' %><%= @percent %>%)
+      </p>
+      <table class="report2 striped bordered">
+        <thead>
+          <tr>
+              <th data-field="id"></th>
+              <th data-field="name">Vendas</th>
+              <th data-field="actions">Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @orders_by_month.each do |user, orders| %>
+
+          <tr>
+            <td width="70%"><%= (user.try(:name) || user.try(:username)) || "Não associado" %></td>
+            <td width="15%"><%= orders.count %></td>
+            <td width="15%"><%= number_to_currency orders.sum(&:total) %></td>
+          </tr>
+
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col s12 m6">
+    <div class="card-panel" style="margin-top: 5px;">
+      <h5 onclick="$('.report3').slideToggle(30);" style="border-bottom: 1px dashed #dedede; padding-bottom: 12px; margin-top: 0; font-size: 16px; color: #aeaeae; font-weight: bold;">
+        Vendas do dia (por vendedor)
+      </h5>
+      <table class="report3 striped bordered">
+        <thead>
+          <tr>
+              <th data-field="id"></th>
+              <th data-field="name">Vendas</th>
+              <th data-field="actions">Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @orders_seller_by_today.each do |seller, orders| %>
+
+          <tr>
+            <td width="70%"><%= seller || "Não associado" %></td>
+            <td width="15%"><%= orders.count %></td>
+            <td width="15%"><%= number_to_currency orders.sum(&:total) %></td>
+          </tr>
+
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col s12 m6">
+    <div class="card-panel" style="margin-top: 5px;">
+      <h5 onclick="$('.report4').slideToggle(30);" style="border-bottom: 1px dashed #dedede; padding-bottom: 12px; margin-top: 0; font-size: 16px; color: #aeaeae; font-weight: bold;">
+        Vendas do mês (por vendedor)
+      </h5>
+      <table class="report4 striped bordered">
+        <thead>
+          <tr>
+              <th data-field="id"></th>
+              <th data-field="name">Vendas</th>
+              <th data-field="actions">Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @orders_seller_by_month.each do |seller, orders| %>
+
+          <tr>
+            <td width="70%"><%= seller || "Não associado" %></td>
+            <td width="15%"><%= orders.count %></td>
+            <td width="15%"><%= number_to_currency orders.sum(&:total) %></td>
+          </tr>
+
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col s12 m6">
+    <div class="card-panel" style="margin-top: 5px;">
+      <h5 onclick="$('.report5').slideToggle(30);" style="border-bottom: 1px dashed #dedede; padding-bottom: 12px; margin-top: 0; font-size: 16px; color: #aeaeae; font-weight: bold;">
+        Vendas do dia (por cliente)
+      </h5>
+      <table class="report5 striped bordered" style="display: none !important;">
+        <thead>
+          <tr>
+              <th data-field="id"></th>
+              <th data-field="name">Vendas</th>
+              <th data-field="actions">Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @orders_client_by_today.each do |client, orders| %>
+
+          <tr>
+            <td width="70%"><%= client.try(:name) || "Não associado" %></td>
+            <td width="15%"><%= orders.count %></td>
+            <td width="15%"><%= number_to_currency orders.sum(&:total) %></td>
+          </tr>
+
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col s12 m6">
+    <div class="card-panel" style="margin-top: 5px;">
+      <h5 onclick="$('.report6').slideToggle(30);" style="border-bottom: 1px dashed #dedede; padding-bottom: 12px; margin-top: 0; font-size: 16px; color: #aeaeae; font-weight: bold;">
+        Vendas do mês (por cliente)
+      </h5>
+      <table class="report6 striped bordered" style="display: none !important;">
+        <thead>
+          <tr>
+              <th data-field="id"></th>
+              <th data-field="name">Vendas</th>
+              <th data-field="actions">Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @orders_client_by_month.each do |client, orders| %>
+
+          <tr>
+            <td width="70%"><%= client.try(:name) || "Não associado" %></td>
+            <td width="15%"><%= orders.count %></td>
+            <td width="15%"><%= number_to_currency orders.sum(&:total) %></td>
+          </tr>
+
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
