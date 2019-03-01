@@ -10,13 +10,15 @@
   <div class="row">
     <div class="card-panel">
       <div class="search-offers">
+        <%#= link_to "Novo Cliente", new_item_path, class: "btn" %>
+        <%= link_to "Imprimir", print_items_path(keyword: params[:keyword]), class: "btn large blue" %>
+
         <%= form_tag items_path, method: :get do %>
             <fieldset style="border: none; margin: 0; padding: 0;">
               <input name="keyword" id="icon_local" style="display: inline;" type="search" placeholder="Filtrar itens" value='<%= params[:keyword] %>'>
               <button class="btn" type="submit" name="action">
                 Filtrar
               </button>
-              <%= link_to "Imprimir", print_items_path(keyword: params[:keyword]), class: "btn large blue" %>
               <%#= link_to "Sem imagem", items_path(noimage: 'noimage'), class: "btn right" %>
           </fieldset>
         <% end %>
