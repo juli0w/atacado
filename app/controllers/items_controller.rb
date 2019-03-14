@@ -60,6 +60,6 @@ private
   end
 
   def item_params
-    params.require(:item).permit(:image, :remove_image)
+    params.require(:item).permit(:image, :remove_image, :name, :price)
   end
 end

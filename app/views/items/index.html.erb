@@ -10,7 +10,7 @@
   <div class="row">
     <div class="card-panel">
       <div class="search-offers">
-        <%#= link_to "Novo Cliente", new_item_path, class: "btn" %>
+        <%= link_to "Novo Item", new_item_path, class: "btn" %>
         <%= link_to "Imprimir", print_items_path(keyword: params[:keyword]), class: "btn large blue" %>
 
         <%= form_tag items_path, method: :get do %>
