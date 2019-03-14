@@ -44,7 +44,7 @@
               <td><%= image_tag item.image, class: "circle materialboxed", style: "width: 60px; height: 60px; border-radius: 0% !important;" %></td>
               <td><%= item.code %></td>
               <td><%= item.name %></td>
-              <td><%= item.subgroup.name %></td>
+              <td><%= item.subgroup.try(:name) %></td>
               <td>
                 <%= link_to "Editar", [:edit, item] %>
               </td>
